@@ -2252,6 +2252,203 @@
     })();
   </script>
 
+  <!-- ============================================================
+       Floating Travia story video (16:9). Two states:
+         • docked   — autoplaying muted preview, bottom-right,
+                      with a centered play button
+         • expanded — large centered modal, plays from the start
+                      with sound + controls. Click outside to close.
+       The expanded overlay sits above the nav so the header is
+       covered while playing.
+       ============================================================ -->
+  <style>
+    .story-pip {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      width: 260px;
+      max-width: calc(100vw - 48px);
+      aspect-ratio: 16 / 9;      /* match the source video — no cropping */
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      background: #000;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28), 0 2px 6px rgba(0, 0, 0, 0.18);
+      z-index: 90;
+      border: none;
+      padding: 0;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 320ms ease, transform 320ms ease, box-shadow 200ms ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .story-pip.is-ready { opacity: 1; transform: translateY(0); }
+    .story-pip:hover { box-shadow: 0 18px 44px rgba(0, 0, 0, 0.36), 0 2px 8px rgba(0, 0, 0, 0.22); }
+    .story-pip:focus-visible { outline: 2px solid #2BB4FF; outline-offset: 3px; }
+    .story-pip:hover .story-pip__play { transform: scale(1.06); }
+
+    .story-pip video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;       /* show the whole frame */
+      display: block;
+      background: #000;
+    }
+
+    /* Centered play button — signals the preview is clickable */
+    .story-pip__play {
+      position: absolute;
+      inset: 0;
+      margin: auto;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.92);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+      transition: transform 180ms ease;
+    }
+    .story-pip__play svg { width: 15px; height: 17px; fill: #111; margin-left: 3px; }
+
+    @media (max-width: 640px) {
+      .story-pip { right: 14px; bottom: 14px; width: 220px; }
+      .story-pip__play { width: 40px; height: 40px; }
+    }
+
+    /* ---- Expanded modal ---- */
+    .story-modal {
+      position: fixed;
+      inset: 0;
+      /* lighter, blurred scrim */
+      background: rgba(240, 240, 244, 0.45);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 3000;             /* above the nav so the header is covered */
+      opacity: 0;
+      transition: opacity 240ms ease;
+      padding: 40px;
+    }
+    .story-modal.is-open { display: flex; }
+    .story-modal.is-visible { opacity: 1; }
+
+    .story-modal__frame {
+      position: relative;
+      width: min(1100px, 100%);
+      aspect-ratio: 16 / 9;
+      max-height: 100%;
+      background: #000;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 40px 90px rgba(0, 0, 0, 0.35);
+      transform: scale(0.96);
+      transition: transform 240ms ease;
+    }
+    .story-modal.is-visible .story-modal__frame { transform: scale(1); }
+    .story-modal__frame video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      background: #000;
+    }
+
+    @media (max-width: 640px) {
+      .story-modal { padding: 16px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .story-pip, .story-modal, .story-modal__frame, .story-pip__play { transition: none; }
+    }
+  </style>
+
+  <button class="story-pip" id="storyPip" type="button" aria-label="Play Travia story video with sound">
+    <video id="storyPipVideo" muted loop playsinline preload="metadata" aria-hidden="true">
+      <source src="images/travia-story.mp4" type="video/mp4">
+    </video>
+    <span class="story-pip__play" aria-hidden="true">
+      <svg viewBox="0 0 10 12"><path d="M0 0 L10 6 L0 12 Z"/></svg>
+    </span>
+  </button>
+
+  <div class="story-modal" id="storyModal" role="dialog" aria-modal="true" aria-label="Travia story video">
+    <div class="story-modal__frame">
+      <video id="storyModalVideo" controls controlsList="nodownload" playsinline preload="metadata">
+        <source src="images/travia-story.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      var pip = document.getElementById('storyPip');
+      var pipVideo = document.getElementById('storyPipVideo');
+      var modal = document.getElementById('storyModal');
+      var modalVideo = document.getElementById('storyModalVideo');
+      if (!pip || !pipVideo || !modal || !modalVideo) return;
+
+      window.setTimeout(function() { pip.classList.add('is-ready'); }, 400);
+
+      var playPip = function() {
+        var p = pipVideo.play();
+        if (p && typeof p.catch === 'function') p.catch(function() {});
+      };
+      if (pipVideo.readyState >= 2) playPip();
+      else pipVideo.addEventListener('loadeddata', playPip, { once: true });
+
+      var lastFocus = null;
+
+      var openModal = function() {
+        lastFocus = document.activeElement;
+        modal.classList.add('is-open');
+        void modal.offsetWidth;
+        modal.classList.add('is-visible');
+        document.documentElement.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden';
+
+        try { pipVideo.pause(); } catch (e) {}
+
+        modalVideo.currentTime = 0;
+        modalVideo.muted = false;
+        modalVideo.volume = 1;
+        var mp = modalVideo.play();
+        if (mp && typeof mp.catch === 'function') {
+          mp.catch(function() {
+            // Fall back to muted if sound autoplay is blocked; user can unmute via controls.
+            modalVideo.muted = true;
+            modalVideo.play().catch(function() {});
+          });
+        }
+      };
+
+      // Closing returns to the autoplaying muted docked preview.
+      var closeModal = function() {
+        modal.classList.remove('is-visible');
+        document.documentElement.style.overflow = '';
+        document.body.style.overflow = '';
+        try { modalVideo.pause(); } catch (e) {}
+        window.setTimeout(function() {
+          modal.classList.remove('is-open');
+          playPip();
+          if (lastFocus && typeof lastFocus.focus === 'function') lastFocus.focus();
+        }, 240);
+      };
+
+      pip.addEventListener('click', openModal);
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) closeModal();   // click outside the video
+      });
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
+      });
+    })();
+  </script>
+
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "cbe772e88ba64865afaca1040e19dfc7"}'></script>
 </body>
 </html>
