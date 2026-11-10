@@ -1330,7 +1330,7 @@
       <div class="travia-title-stage">
         <h1 class="travia-reveal-title" id="traviaRevealTitle" aria-label="Travia: From Scattered Paperwork to Automated Transport Operations">Travia: From Scattered Paperwork to Automated Transport Operations</h1>
         <div class="travia-reveal-image-wrap" id="traviaRevealImageWrap">
-          <img class="travia-reveal-image" id="traviaRevealImage" src="images/travia-hero.jpg" alt="Travia product preview — laptop view and calendar dashboard">
+          <img class="travia-reveal-image" id="traviaRevealImage" src="images/travia-hero-wide-2x.jpg" alt="Travia product preview — laptop view and calendar dashboard">
         </div>
         <div class="travia-scroll-hint" id="traviaScrollHint" aria-hidden="true">Scroll down</div>
       </div>
@@ -1451,7 +1451,7 @@
       </div>
 
       <figure class="case-figure case-figure--contained" data-fw-figure>
-        <img src="images/travia-solution-calendar.png" alt="Travia calendar — a single view showing upcoming rides, assigned vehicles and drivers, and document status" class="case-figure-img">
+        <img src="images/travia-week-calendar.png" alt="Travia calendar — a single view showing upcoming rides, assigned vehicles and drivers, and document status" class="case-figure-img">
       </figure>
 
       <div class="case-subblock">
@@ -1461,7 +1461,18 @@
       </div>
 
       <figure class="case-figure case-figure--contained" data-fw-figure>
-        <video class="case-figure-video" src="images/travia-booking-video.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Travia booking workflow — vehicle, driver and documents all connected to a single booking"></video>
+        <video class="case-figure-video" src="images/travia-booking-demo.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Travia booking workflow — vehicle, driver and documents all connected to a single booking"></video>
+      </figure>
+
+      <div class="case-subblock">
+        <h3 class="case-subblock-heading">AI Assistant: booking rides in plain language</h3>
+        <p>The assistant lets dispatchers book rides by describing them in plain English, for example &ldquo;Book a ride on the 20th at 9am for Oakwood Academy to Oxford, back at 17:00.&rdquo; It runs on Anthropic&rsquo;s Claude Haiku through a Next.js API route. The model works through a set of custom tools that read the carrier&rsquo;s own data: it finds the client, checks which vehicles and drivers are free, and looks up the schedule.</p>
+        <p>It never writes to the database. Instead it prepares a draft ride card with the route, times, vehicle, driver and an estimated distance, and flags anything that&rsquo;s missing. The ride is only created when the dispatcher clicks &ldquo;Create ride&rdquo;, which uses the app&rsquo;s normal booking flow and its availability checks. Every data lookup is limited to that carrier&rsquo;s own records, requests are rate-limited, and the instructions are cached to keep each request fast and cheap.</p>
+        <p>On the interface side, the assistant opens from the sidebar or with &#8984;J. It floats as a draggable window that can be minimized or pinned to the side, where it shares a column with ride details so the calendar stays usable.</p>
+      </div>
+
+      <figure class="case-figure case-figure--contained" data-fw-figure>
+        <video class="case-figure-video" src="images/travia-assistant-demo.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Travia AI assistant — booking a ride from a plain-language prompt"></video>
       </figure>
 
       <div class="case-subblock">
@@ -1766,7 +1777,7 @@
           <div class="case-reflections-grid">
 
             <div class="case-reflections-media-wrap">
-              <img src="images/travia-reflections-fleet.png" alt="Travia drivers and fleet screens" class="case-reflections-media" loading="lazy">
+              <img src="images/travia-fleet-drivers.png" alt="Travia drivers and fleet screens" class="case-reflections-media" loading="lazy">
             </div>
 
             <div class="case-reflections-list">
