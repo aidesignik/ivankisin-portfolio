@@ -1464,6 +1464,17 @@
         <video class="case-figure-video" src="images/travia-booking-video.webm" autoplay muted loop playsinline preload="metadata" aria-label="Travia booking workflow — vehicle, driver and documents all connected to a single booking"></video>
       </figure>
 
+      <div class="case-subblock">
+        <h3 class="case-subblock-heading">AI Assistant: booking rides in plain language</h3>
+        <p>The assistant lets dispatchers book rides by describing them in plain English, for example &ldquo;Book a ride on the 20th at 9am for Oakwood Academy to Oxford, back at 17:00.&rdquo; It runs on Anthropic&rsquo;s Claude Haiku through a Next.js API route. The model works through a set of custom tools that read the carrier&rsquo;s own data: it finds the client, checks which vehicles and drivers are free, and looks up the schedule.</p>
+        <p>It never writes to the database. Instead it prepares a draft ride card with the route, times, vehicle, driver and an estimated distance, and flags anything that&rsquo;s missing. The ride is only created when the dispatcher clicks &ldquo;Create ride&rdquo;, which uses the app&rsquo;s normal booking flow and its availability checks. Every data lookup is limited to that carrier&rsquo;s own records, requests are rate-limited, and the instructions are cached to keep each request fast and cheap.</p>
+        <p>On the interface side, the assistant opens from the sidebar or with &#8984;J. It floats as a draggable window that can be minimized or pinned to the side, where it shares a column with ride details so the calendar stays usable.</p>
+      </div>
+
+      <figure class="case-figure case-figure--contained" data-fw-figure>
+        <video class="case-figure-video" src="images/travia-assistant-ui.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Travia AI assistant — booking a ride from a plain-language prompt"></video>
+      </figure>
+
       <section class="case-dark" aria-label="What Travia brings together">
         <div class="case-dark-inner">
           <h2 class="case-dark-title">What Travia brings together</h2>
