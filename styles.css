@@ -1569,6 +1569,12 @@ body > *:not(.page-loader) {
     padding: 28px 28px 0;
   }
 
+  /* Overlay-title cards (title sits at the bottom) need bottom padding */
+  .case-card--travia,
+  .case-card--sottovoce {
+    padding: 28px 28px 32px;
+  }
+
   .case-card--radar {
     padding-right: 0;
   }
